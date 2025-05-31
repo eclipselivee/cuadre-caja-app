@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -7,7 +6,7 @@ st.set_page_config(page_title="Cuadre de Caja", layout="wide")
 st.title("🧾 Cuadre de Caja Diario")
 
 st.sidebar.header("⚙️ Parámetros")
-tasa = st.sidebar.number_input("Tasa del día (Bs/$)", min_value=0.1, value=145.0, step=0.1)
+tasa = st.sidebar.number_input("💱 Tasa del día (Bs/$)", min_value=0.1, value=145.0, step=0.1)
 
 st.markdown("### Ingresos por método")
 metodos = [
@@ -26,7 +25,7 @@ for metodo in metodos:
 df = pd.DataFrame(data, columns=["Método", "Bs", "$", "Convertido $ (Bs/Tasa)"])
 df["Total $"] = df["$"] + df["Convertido $ (Bs/Tasa)"]
 
-st.markdown("### 💰 Totales del sistema")
+st.markdown("### 💰 Totales del cuaderno")
 st.dataframe(df, use_container_width=True)
 total_bs = df["Bs"].sum()
 total_usd = df["$"].sum()
@@ -36,8 +35,20 @@ total_final_usd = df["Total $"].sum()
 st.write(f"**Total Bs ingresados:** {total_bs:,.2f}")
 st.write(f"**Total $ ingresados:** {total_usd:,.2f}")
 st.write(f"**Convertido $ desde Bs:** {total_convertido:,.2f}")
-st.write(f"**Total sistema ($):** :green[{total_final_usd:,.2f}]")
+st.write(f"**Total cuaderno ($):** :green[{total_final_usd:,.2f}]")
 
+# Nueva sección: Facturación del sistema
+st.markdown("### 🧾 Facturación del sistema (PSCloud)")
+facturacion_bs = st.number_input("FACTURACIÓN (Bs)", min_value=0.0)
+facturacion_usd = facturacion_bs / tasa
+st.write(f"**FACTURACIÓN convertida ($):** :blue[{facturacion_usd:,.2f}]")
+
+# Comparación con total del cuaderno
+diferencia_factura = facturacion_usd - total_final_usd
+color_diff = "green" if diferencia_factura >= 0 else "red"
+st.write(f"**Diferencia (Factura - Cuaderno) $:** :{color_diff}[{diferencia_factura:,.2f}]")
+
+# Efectivo físico
 st.markdown("### 🧮 Efectivo físico")
 bs_caja = st.number_input("Bs en caja", min_value=0.0)
 usd_caja = st.number_input("$ en caja", min_value=0.0)
@@ -60,3 +71,4 @@ if st.button("📥 Descargar en Excel"):
     df_export.loc["TOTAL"] = df_export.sum(numeric_only=True)
     df_export.to_excel("cuadre_caja.xlsx")
     st.success("Archivo Excel generado: cuadre_caja.xlsx")
+    Actualización app.py con mejoras
